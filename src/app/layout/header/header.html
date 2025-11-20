@@ -1,0 +1,60 @@
+<header class="bg-white shadow-sm sticky top-0 z-50">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      
+      <div class="flex-shrink-0">
+         <a routerLink="/" class="flex items-center space-x-2">
+            <img src="assets/logo-trekreplay.png" alt="Logo de TrekReplay" class="h-8 w-auto">
+        </a>
+      </div>
+
+      <div class="hidden md:flex md:space-x-8">
+        <a routerLink="/" 
+           class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+           Inici (Productes)
+        </a>
+        <a routerLink="/contacta" 
+           class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+           Contacta'ns
+        </a>
+      </div>
+
+      <div class="flex items-center space-x-3">
+
+        <div *ngIf="!isLoggedIn; else usuariAutenticat">
+          <a routerLink="/register" 
+             class="hidden md:inline-block bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-full text-sm font-medium transition-colors">
+            Registrar-se
+          </a>
+          <a routerLink="/login" 
+             class="bg-[#8B6E5B] text-white hover:bg-[#6a5243] px-4 py-2 rounded-full text-sm font-medium transition-colors">
+            Conectar-se
+          </a>
+        </div>
+
+        <ng-template #usuariAutenticat>
+          
+          <a routerLink="/carret" 
+             class="text-gray-600 hover:text-gray-900 p-1 rounded-full"
+             title="Carret">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </a>
+
+          <a *ngIf="isVenedor" 
+             routerLink="/dashboard"
+             class="hidden md:inline-block bg-gray-800 text-white hover:bg-gray-700 px-4 py-2 rounded-full text-sm font-medium transition-colors">
+            Panell Venedor
+          </a>
+
+          <button (click)="logout()" 
+                  class="bg-red-500 text-white hover:bg-red-600 px-4 py-2 rounded-full text-sm font-medium transition-colors">
+            Logout
+          </button>
+        </ng-template>
+
+      </div>
+    </div>
+  </nav>
+</header>

@@ -25,9 +25,17 @@ export class Login {
     this.authService.login(this.credentials).subscribe({
       next: (res) => {
         console.log('Login correcte', res);
-        // Redirigir segons el rol? De moment al panell principal o home
-        // Si és venedor -> /dashboard, si és comprador -> /home
-        this.router.navigate(['/']); 
+        
+        // === INICI DE LA MODIFICACIÓ ===
+        // Comprovem el rol per a la redirecció
+        if (this.authService.isVenedor()) {
+          // Si és Venedor (role_id 2), va al seu panell
+          this.router.navigate(['/dashboard']); 
+        } else {
+          // Si és Comprador (role_id 3) o Admin, va a la Home
+          this.router.navigate(['/']); 
+        }
+
       },
       error: (err) => {
         console.error('Error de login', err);

@@ -6,17 +6,15 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ApiService {
-  // La URL del teu Back-end Laravel (assegura't que php artisan serve està en marxa)
   private baseUrl = 'http://127.0.0.1:8000/api';
 
   constructor(private http: HttpClient) { }
 
-  // Mètode genèric per obtenir capçaleres amb el Token (si existeix)
-  private getHeaders(): HttpHeaders {
+  // Mètode privat per obtenir les capçaleres BÀSIQUES (Token i Accept)
+  private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('auth_token');
     let headers = new HttpHeaders({
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
+      'Accept': 'application/json'
     });
 
     if (token) {
@@ -25,20 +23,34 @@ export class ApiService {
     return headers;
   }
 
-  // Mètodes HTTP genèrics
+
   get(endpoint: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/${endpoint}`, { headers: this.getHeaders() });
+    return this.http.get(`${this.baseUrl}/${endpoint}`, { headers: this.getAuthHeaders() });
   }
 
   post(endpoint: string, data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${endpoint}`, data, { headers: this.getHeaders() });
+    // Afegim la capçalera JSON
+    const headers = this.getAuthHeaders().set('Content-Type', 'application/json');
+    return this.http.post(`${this.baseUrl}/${endpoint}`, data, { headers: headers });
   }
 
   put(endpoint: string, data: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/${endpoint}`, data, { headers: this.getHeaders() });
+    const headers = this.getAuthHeaders().set('Content-Type', 'application/json');
+    return this.http.put(`${this.baseUrl}/${endpoint}`, data, { headers: headers });
   }
 
   delete(endpoint: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${endpoint}`, { headers: this.getHeaders() });
+    return this.http.delete(`${this.baseUrl}/${endpoint}`, { headers: this.getAuthHeaders() });
+  }
+
+
+  // === NOU MÈTODE PER PUJAR FITXERS (FormData) ===
+
+  postWithFormData(endpoint: string, formData: FormData): Observable<any> {
+    // Important: NO afegim 'Content-Type'. 
+    // El navegador ho farà automàticament amb el 'boundary' correcte per a FormData.
+    return this.http.post(`${this.baseUrl}/${endpoint}`, formData, { 
+      headers: this.getAuthHeaders() 
+    });
   }
 }

@@ -1,0 +1,82 @@
+<div class="max-w-7xl mx-auto p-4 md:p-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">Panell del Venedor</h1>
+    <a routerLink="/dashboard/crear" class="bg-[#8B6E5B] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#6a5243] transition-colors">
+      Crear un viatge
+    </a>
+  </div>
+
+  <div *ngIf="errorMessage" class="p-4 mb-4 bg-red-100 text-red-700 rounded border border-red-400">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="successMessage" class="p-4 mb-4 bg-green-100 text-green-700 rounded border border-green-400">
+    {{ successMessage }}
+  </div>
+
+  <div class="bg-white shadow-md rounded-lg divide-y divide-gray-200">
+    
+    <div class="hidden md:flex bg-gray-50 p-4 font-semibold text-gray-600">
+      <div class="w-2/5">Títol</div>
+      <div class="w-1/5">Tipus</div>
+      <div class="w-1/5">Estat</div>
+      <div class="w-1/5 text-right">Accions</div>
+    </div>
+
+    <div *ngIf="meusViatges.length === 0 && !errorMessage" class="p-8 text-center text-gray-500">
+      <p>Encara no has creat cap viatge.</p>
+      <a routerLink="/dashboard/crear" class="text-[#8B6E5B] hover:underline mt-2 inline-block">Comença ara</a>
+    </div>
+
+    <div *ngFor="let viatge of meusViatges" class="flex flex-col md:flex-row items-center p-4">
+      
+      <div class="w-full md:w-2/5 flex items-center mb-2 md:mb-0">
+        <img [src]="viatge.imatge_principal ? 'http://127.0.0.1:8000/storage/' + viatge.imatge_principal : 'https://via.placeholder.com/100x60.png?text=TrekReplay'" 
+             alt="{{ viatge.titol }}"
+             class="w-24 h-16 object-cover rounded-md mr-4">
+        <div>
+          <span class="font-bold text-lg text-gray-900">{{ viatge.titol }}</span>
+        </div>
+      </div>
+      
+      <div class="w-full md:w-1/5 text-gray-600">
+        <span class="md:hidden font-semibold">Tipus: </span>
+        {{ viatge.tipus_viatge }}
+      </div>
+
+      <div class="w-full md:w-1/5 text-gray-600">
+        <span *ngIf="viatge.publicat; else esborrany" 
+              class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-sm cursor-pointer"
+              (click)="canviarEstatPublicacio(viatge.id, viatge.publicat)"
+              title="Clic per deshabilitar">
+          Publicat
+        </span>
+        <ng-template #esborrany>
+          <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-sm cursor-pointer"
+                (click)="canviarEstatPublicacio(viatge.id, viatge.publicat)"
+                title="Clic per publicar">
+            Esborrany
+          </span>
+        </ng-template>
+      </div>
+      
+      <div class="w-full md:w-1/5 flex justify-end items-center space-x-3 mt-4 md:mt-0">
+        
+        <a [routerLink]="['/dashboard/editar', viatge.id]" title="Editar"
+           class="text-gray-500 hover:text-blue-600">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        </a>
+        
+        <button (click)="esborrarViatge(viatge.id)" title="Esborrar"
+                class="text-gray-500 hover:text-red-600">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        </button>
+        
+        <a [routerLink]="['/viatge', viatge.id]" target="_blank" title="Veure (Públic)"
+           class="text-gray-500 hover:text-green-600">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+        </a>
+      </div>
+    </div>
+    </div>
+</div>
