@@ -34,7 +34,7 @@
 
         <ng-template #usuariAutenticat>
           
-          <a routerLink="/carret" 
+          <a *ngIf="!isVenedor" routerLink="/carret" 
              class="text-gray-600 hover:text-gray-900 p-1 rounded-full"
              title="Carret">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

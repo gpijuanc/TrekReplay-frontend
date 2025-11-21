@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from './api';
-import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
+import { Observable, tap, BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private user: any = null;
+  public authStatus = new BehaviorSubject<boolean>(this.hasToken());
 
   constructor(private api: ApiService, private router: Router) {
     // Intentar recuperar l'usuari del localStorage si recarreguem la pàgina
@@ -17,6 +18,10 @@ export class AuthService {
     }
   }
 
+  // Helper privat per saber si hi ha token inicialment
+  private hasToken(): boolean {
+    return !!localStorage.getItem('auth_token');
+  }
   // Registre (envia role_id, etc.)
   register(data: any): Observable<any> {
     return this.api.post('register', data).pipe(
@@ -36,6 +41,7 @@ export class AuthService {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
     this.user = null;
+    this.authStatus.next(false);
     this.router.navigate(['/login']);
   }
 
@@ -44,6 +50,7 @@ export class AuthService {
     localStorage.setItem('auth_token', authResult.access_token);
     localStorage.setItem('user', JSON.stringify(authResult.user));
     this.user = authResult.user;
+    this.authStatus.next(true)
   }
 
   // Helpers

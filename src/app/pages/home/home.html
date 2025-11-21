@@ -3,106 +3,105 @@
   
   <aside class="w-full md:w-1/4 p-4 md:pr-8">
     <h2 class="text-xl font-bold mb-4">Filtres</h2>
-
-    <div class="flex flex-wrap gap-2 mb-4">
-      <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">Japó <button>x</button></span>
-      <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">Aventura <button>x</button></span>
-      <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">Ibai <button>x</button></span>
-    </div>
     
     <div class="mb-6">
       <h3 class="font-semibold mb-2 text-gray-800">Tipus de Viatge</h3>
-      <label class="flex items-center space-x-2 text-gray-700">
-        <input type="checkbox" class="rounded border-gray-300 text-[#8B6E5B] focus:ring-[#8B6E5B]">
-        <span>Paquet amb enllaços</span>
+      
+      <label class="flex items-center space-x-2 text-gray-700 mb-2 cursor-pointer">
+        <input type="checkbox" 
+               [(ngModel)]="mostrarAfiliats" 
+               (change)="aplicarFiltres()"
+               class="rounded border-gray-300 text-[#8B6E5B] focus:ring-[#8B6E5B]">
+        <span>Ruta amb enllaços</span>
       </label>
-      <label class="flex items-center space-x-2 text-gray-700">
-        <input type="checkbox" class="rounded border-gray-300 text-[#8B6E5B] focus:ring-[#8B6E5B]">
+      
+      <label class="flex items-center space-x-2 text-gray-700 cursor-pointer">
+        <input type="checkbox" 
+               [(ngModel)]="mostrarPaquets" 
+               (change)="aplicarFiltres()"
+               class="rounded border-gray-300 text-[#8B6E5B] focus:ring-[#8B6E5B]">
         <span>Paquet Complert</span>
       </label>
     </div>
     
     <div class="mb-6">
-      <label for="preu" class="font-semibold mb-2 block text-gray-800">Preu</label>
-      <input type="range" id="preu" min="0" max="2000" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-thumb-[#8B6E5B]">
+      <label for="preu" class="font-semibold mb-2 block text-gray-800">
+        Preu Màxim: <span class="text-[#8B6E5B]">{{ filtrePreuMaxim }}€</span>
+      </label>
+      
+      <input type="range" id="preu" 
+             min="0" 
+             [max]="preuMaximReal" 
+             step="10"
+             [(ngModel)]="filtrePreuMaxim"
+             (input)="aplicarFiltres()"
+             class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#8B6E5B]">
+      
       <div class="flex justify-between text-sm text-gray-600 mt-1">
-        <span>€1000</span>
-        <span>€2000</span>
+        <span>€0</span>
+        <span>€{{ preuMaximReal }}</span>
       </div>
-    </div>
-    
-    <div class="mb-6">
-      <h3 class="font-semibold mb-2 text-gray-800">País</h3>
-      <label class="flex items-center space-x-2 text-gray-700">
-        <input type="checkbox" class="rounded border-gray-300 text-[#8B6E5B] focus:ring-[#8B6E5B]">
-        <span>Japó</span>
-      </label>
-      <label class="flex items-center space-x-2 text-gray-700">
-        <input type="checkbox" class="rounded border-gray-300 text-[#8B6E5B] focus:ring-[#8B6E5B]">
-        <span>Islandia</span>
-      </label>
-      <label class="flex items-center space-x-2 text-gray-700">
-        <input type="checkbox" class="rounded border-gray-300 text-[#8B6E5B] focus:ring-[#8B6E5B]">
-        <span>Egipte</span>
-      </label>
-    </div>
-
-    <div class="mb-6">
-      <h3 class="font-semibold mb-2 text-gray-800">Creador</h3>
-      <label class="flex items-center space-x-2 text-gray-700">
-        <input type="checkbox" class="rounded border-gray-300 text-[#8B6E5B] focus:ring-[#8B6E5B]">
-        <span>Ibai</span>
-      </label>
-      <label class="flex items-center space-x-2 text-gray-700">
-        <input type="checkbox" class="rounded border-gray-300 text-[#8B6E5B] focus:ring-[#8B6E5B]">
-        <span>Plex</span>
-      </label>
-      <label class="flex items-center space-x-2 text-gray-700">
-        <input type="checkbox" class="rounded border-gray-300 text-[#8B6E5B] focus:ring-[#8B6E5B]">
-        <span>Skain</span>
-      </label>
+      <p class="text-xs text-gray-500 mt-2">*Només afecta als Paquets Tancats</p>
     </div>
   </aside>
 
   <main class="w-full md:w-3/4 p-4">
     
-    <div class="flex flex-col md:flex-row justify-between items-center mb-4">
-      <input type="search" placeholder="Cerca..." class="border rounded-md p-2 w-full md:w-1/2">
-      <div class="flex space-x-2 text-sm mt-4 md:mt-0">
-        <button class="bg-[#8B6E5B] text-white px-3 py-1 rounded-full">Nou</button>
-        <button class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full">Preu ascendent</button>
-        <button class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full">Preu descendent</button>
-        <button class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full">Més valorats</button>
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+      
+      <div class="relative w-full md:w-2/3">
+        <input type="search" 
+               [(ngModel)]="cercaText"
+               (input)="aplicarFiltres()"
+               placeholder="Cerca per títol..." 
+               class="border border-gray-300 rounded-full p-3 pl-5 w-full focus:outline-none focus:border-[#8B6E5B] focus:ring-1 focus:ring-[#8B6E5B]">
+      </div>
+
+      <div class="text-sm text-gray-600">
+        <strong>{{ viatgesFiltrats.length }}</strong> resultats trobats
       </div>
     </div>
 
-    <div *ngIf="errorMessage" class="p-4 bg-red-100 text-red-700 rounded border border-red-400">
+    <div *ngIf="errorMessage" class="p-4 bg-red-100 text-red-700 rounded border border-red-400 mb-4">
       {{ errorMessage }}
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       
-      <div *ngFor="let viatge of viatges" class="border rounded-lg shadow-sm overflow-hidden bg-white">
+      <div *ngFor="let viatge of viatgesFiltrats" class="border rounded-lg shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow duration-200">
         
-        <a [routerLink]="['/viatge', viatge.id]" class="block h-48 overflow-hidden">
+        <a [routerLink]="['/viatge', viatge.id]" class="block h-48 overflow-hidden relative">
           <img [src]="viatge.imatge_principal ? 'http://127.0.0.1:8000/storage/' + viatge.imatge_principal : 'https://via.placeholder.com/400x300.png?text=TrekReplay'" 
                alt="{{ viatge.titol }}" 
                class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
+          
+          <div class="absolute top-2 right-2">
+            <span *ngIf="viatge.tipus_viatge === 'Paquet Tancat'" class="bg-black/70 text-white text-xs px-2 py-1 rounded">Paquet</span>
+            <span *ngIf="viatge.tipus_viatge === 'Afiliats'" class="bg-blue-600/80 text-white text-xs px-2 py-1 rounded">Ruta</span>
+          </div>
         </a>
         
         <div class="p-4">
-          <h3 class="text-lg font-bold text-gray-900 truncate">
-            <a [routerLink]="['/viatge', viatge.id]">{{ viatge.titol }}</a>
+          <h3 class="text-lg font-bold text-gray-900 truncate mb-2">
+            <a [routerLink]="['/viatge', viatge.id]" class="hover:text-[#8B6E5B]">{{ viatge.titol }}</a>
           </h3>
           
-          <div *ngIf="viatge.tipus_viatge === 'Paquet Tancat'; else afiliatBlock">
-            <span class="text-xl font-semibold text-gray-800">€{{ viatge.preu }}</span>
+          <div class="flex justify-between items-center">
+            <div *ngIf="viatge.tipus_viatge === 'Paquet Tancat'; else afiliatInfo">
+              <span class="text-xl font-bold text-gray-800">€{{ viatge.preu }}</span>
+            </div>
+            <ng-template #afiliatInfo>
+              <span class="text-sm text-gray-500">Configura la teva reserva</span>
+            </ng-template>
+            
+            <a [routerLink]="['/viatge', viatge.id]" class="text-[#8B6E5B] hover:underline text-sm font-medium">Veure</a>
           </div>
-          <ng-template #afiliatBlock>
-            <span class="text-lg font-semibold text-blue-600">Ruta (Afiliats)</span>
-          </ng-template>
-          
-          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="viatgesFiltrats.length === 0 && !errorMessage" class="col-span-full text-center py-12 text-gray-500">
+        <p class="text-lg">No s'han trobat viatges amb aquests criteris.</p>
+        <button (click)="cercaText=''; mostrarPaquets=true; mostrarAfiliats=true; aplicarFiltres()" class="mt-2 text-[#8B6E5B] underline">Netejar filtres</button>
       </div>
 
     </div>

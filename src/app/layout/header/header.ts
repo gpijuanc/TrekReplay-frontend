@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth';
@@ -10,31 +10,35 @@ import { AuthService } from '../../services/auth';
   templateUrl: './header.html',
   styleUrls: []
 })
-export class Header {
-  // Variables per controlar l'estat
+export class Header implements OnInit {
+  
   isLoggedIn: boolean = false;
   isVenedor: boolean = false;
   usuariNom: string = '';
 
-  constructor(private authService: AuthService) {
-    // Comprovem l'estat inicial
-    this.actualitzarEstat();
+  constructor(private authService: AuthService) {}
+
+  ngOnInit() {
+    // Ens subscrivim: Aquest codi s'executa AUTOMÀTICAMENT
+    // cada vegada que algú entra o surt (login/logout).
+    this.authService.authStatus.subscribe(isAuthenticated => {
+      this.isLoggedIn = isAuthenticated;
+      
+      if (this.isLoggedIn) {
+        // Si estem loguejats, recuperem les dades
+        const usuari = this.authService.getUser();
+        this.usuariNom = usuari?.nom || '';
+        this.isVenedor = this.authService.isVenedor();
+      } else {
+        // Si no, netegem les dades
+        this.isVenedor = false;
+        this.usuariNom = '';
+      }
+    });
   }
 
-  // Aquesta funció comprova l'estat. La cridarem sovint.
-  actualitzarEstat() {
-    this.isLoggedIn = this.authService.isLoggedIn();
-    if (this.isLoggedIn) {
-      const usuari = this.authService.getUser();
-      this.usuariNom = usuari?.nom || '';
-      this.isVenedor = this.authService.isVenedor();
-    }
-  }
-
-  // Funció de Logout
   logout() {
     this.authService.logout();
-    // Un cop desloguejat, actualitzem l'estat del header
-    this.actualitzarEstat();
+    // NO cal cridar res més. El 'logout' del servei avisa al 'subscribe' de dalt.
   }
 }
