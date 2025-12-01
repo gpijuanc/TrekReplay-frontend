@@ -1,18 +1,15 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // Necessari per als formularis (ngModel)
-import { AuthService } from '../../services/auth'; // Importa el teu servei
+import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../services/auth'; 
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule], // Importem mòduls aquí
-  templateUrl: './login.html', // Assegura't que el fitxer HTML es diu així
-  styleUrls: [] // Si tens CSS específic
+  imports: [CommonModule, FormsModule, RouterModule], 
+  templateUrl: './login.html', 
 })
 export class Login {
-  // Model de dades
   credentials = {
     correu: '',
     contrasenya: ''

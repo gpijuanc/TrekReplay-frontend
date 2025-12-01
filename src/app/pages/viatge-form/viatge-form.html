@@ -1,0 +1,110 @@
+<div class="max-w-5xl mx-auto p-4 md:p-8">
+  <h1 class="text-3xl font-bold mb-6">{{ isEditing ? 'Editar' : 'Crear' }} Viatge</h1>
+
+  <div *ngIf="errorMessage" class="bg-red-100 text-red-700 p-4 rounded mb-4">
+    {{ errorMessage }}
+  </div>
+
+  <form (ngSubmit)="onSubmit()" class="space-y-6">
+    
+    <div>
+      <label class="block font-semibold mb-1">Títol del Viatge</label>
+      <input type="text" [(ngModel)]="viatge.titol" name="titol" required
+             class="w-full border rounded p-2">
+    </div>
+
+    <div>
+        <label class="block font-semibold mb-1">País / Països</label>
+        <input type="text" [(ngModel)]="paisInput" name="pais" placeholder="Ex: Japó, Corea (separats per coma)"
+               class="w-full border rounded p-2">
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <label class="block font-semibold mb-1">Imatge de Portada</label>
+            <input type="file" (change)="onPortadaSelected($event)" accept="image/*" class="w-full">
+        </div>
+        <div>
+            <label class="block font-semibold mb-1">Galeria (Opcional)</label>
+            <input type="file" (change)="onGaleriaSelected($event)" multiple accept="image/*" class="w-full">
+        </div>
+    </div>
+
+    <div>
+        <div class="flex justify-between items-center mb-2">
+            <label class="block font-semibold">Contingut del Viatge (Blog)</label>
+            <button type="button" (click)="obrirModalAfiliat()" 
+                    class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+                🔗 Afegir Enllaç d'Afiliat
+            </button>
+        </div>
+        
+        <quill-editor [(ngModel)]="viatge.blog" name="blog" 
+                      [modules]="quillConfig" 
+                      (onEditorCreated)="editorCreated($event)"
+                      class="bg-white h-64 block"></quill-editor>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-gray-50 p-4 rounded">
+        <div>
+            <label class="block font-semibold mb-1">Tipus</label>
+            <select [(ngModel)]="viatge.tipus_viatge" name="tipus" class="w-full border rounded p-2">
+                <option value="Afiliats">Ruta d'Afiliats</option>
+                <option value="Paquet Tancat">Paquet Tancat</option>
+            </select>
+        </div>
+        
+        <div *ngIf="viatge.tipus_viatge === 'Paquet Tancat'">
+            <label class="block font-semibold mb-1">Preu (€)</label>
+            <input type="number" [(ngModel)]="viatge.preu" name="preu" class="w-full border rounded p-2">
+        </div>
+
+        <div class="flex items-center mt-6">
+            <input type="checkbox" [(ngModel)]="viatge.publicat" name="publicat" id="pub" class="mr-2 h-5 w-5">
+            <label for="pub" class="font-semibold">Publicar Viatge</label>
+        </div>
+    </div>
+
+    <div class="flex justify-end">
+        <button type="submit" class="bg-[#8B6E5B] text-white px-8 py-3 rounded-lg font-bold hover:bg-[#6a5243]">
+            {{ isEditing ? 'Actualitzar' : 'Crear Viatge' }}
+        </button>
+    </div>
+
+  </form>
+</div>
+
+<div *ngIf="showAffiliateModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+        <h3 class="text-xl font-bold mb-4">Inserir Enllaç d'Afiliat</h3>
+        
+        <div class="mb-4">
+            <label class="block text-sm font-semibold mb-1">Plataforma</label>
+            <select [(ngModel)]="affiliateData.platform" class="w-full border rounded p-2">
+                <option *ngFor="let p of plataformes" [value]="p.key">{{ p.name }}</option>
+            </select>
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-semibold mb-1">Text Visible</label>
+            <input type="text" 
+                   [(ngModel)]="affiliateData.text" 
+                   class="w-full border rounded p-2" 
+                   placeholder="Ex: Clic aquí per veure l'hotel">
+            <p class="text-xs text-gray-500 mt-1">Si havies seleccionat text, ja sortirà aquí.</p>
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-semibold mb-1">URL Original</label>
+            <input type="text" 
+                   [(ngModel)]="affiliateData.url" 
+                   class="w-full border rounded p-2" 
+                   placeholder="https://booking.com/...">
+        </div>
+
+        <div class="flex justify-end space-x-2">
+            <button (click)="showAffiliateModal = false" class="px-4 py-2 text-gray-600">Cancel·lar</button>
+            <button (click)="inserirEnllacAfiliat()" class="bg-blue-600 text-white px-4 py-2 rounded">Inserir</button>
+        </div>
+    </div>
+</div>

@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ViatgeService } from '../../services/viatge'; // Importem el servei
+import { ViatgeService } from '../../services/viatge'; 
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-venedor-dashboard',
-  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './venedor-dashboard.html',
   styleUrls: []
 })
 export class VenedorDashboard implements OnInit {
-
+  readonly #destroyRef = inject(DestroyRef);
   meusViatges: any[] = [];
   errorMessage: string = '';
   successMessage: string = '';
@@ -27,7 +27,9 @@ export class VenedorDashboard implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    this.viatgeService.getMyViatges().subscribe({
+    this.viatgeService.getMyViatges().pipe(
+            takeUntilDestroyed(this.#destroyRef)
+        ).subscribe({
       next: (data) => {
         this.meusViatges = data;
       },
@@ -63,7 +65,7 @@ export class VenedorDashboard implements OnInit {
     const accioText = nouEstat ? 'publicar' : 'deshabilitar';
 
     this.viatgeService.updateViatge(id, { publicat: nouEstat }).subscribe({
-      next: (res) => {
+      next: () => {
         this.successMessage = `Viatge ${accioText} correctament.`;
         this.carregarMeusViatges(); // Refresquem la llista
       },

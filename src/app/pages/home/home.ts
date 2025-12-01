@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ViatgeService } from '../../services/viatge'; // Importem el servei
+import { ViatgeService } from '../../services/viatge'; 
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
-  standalone: true,
-  imports: [CommonModule, RouterModule,FormsModule], // Afegim RouterModule per als enllaços
+  imports: [CommonModule, RouterModule,FormsModule], 
   templateUrl: './home.html',
   styleUrls: []
 })
+
 export class Home implements OnInit {
   
   errorMessage: string = '';
@@ -63,7 +63,7 @@ export class Home implements OnInit {
     this.viatgesFiltrats = this.totsElsViatges.filter(viatge => {
       
       // 1. Filtre de Text (Cerca)
-      const coincideixText = viatge.titol.toLowerCase().includes(this.cercaText.toLowerCase());
+      const coincideixText = viatge?.titol?.toLowerCase().includes(this.cercaText?.toLowerCase());
 
       // 2. Filtre de Tipus (Checkboxes)
       let coincideixTipus = false;

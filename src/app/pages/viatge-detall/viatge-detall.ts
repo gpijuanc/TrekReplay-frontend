@@ -1,4 +1,4 @@
-import { Component, OnInit, SecurityContext } from '@angular/core';
+import { Component, inject, OnInit, SecurityContext } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router'; // Per llegir l'ID de la URL
 import { ViatgeService } from '../../services/viatge'; // El nostre servei
@@ -9,33 +9,31 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-viatge-detall',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './viatge-detall.html',
   styleUrls: []
 })
 export class ViatgeDetall implements OnInit {
-  
-  viatge: any = null; // Objecte per desar el viatge
-  blogHtml: SafeHtml | null = null; // Per a l'HTML segur
+  readonly #route= inject(ActivatedRoute);
+  viatge: any = null; 
+  blogHtml: SafeHtml | null = null; 
   errorMessage: string = '';
   isLoggedIn: boolean = false;
   successMessage: string = '';
 
   constructor(
-    private route: ActivatedRoute, // Injectem el servei de Rutes
-    private viatgeService: ViatgeService, // Injectem el servei de Viatges
-    private sanitizer: DomSanitizer, // Injectem el Sanitizer
+    private viatgeService: ViatgeService, 
+    private sanitizer: DomSanitizer,
     private carretService: CarretService,
     private authService: AuthService,
     private router: Router
   ) {
-    this.isLoggedIn = this.authService.isLoggedIn();
+    this.isLoggedIn = this.authService.isLoggedIn(); //ngOninit?
   }
 
   ngOnInit(): void {
     // 1. Obtenim l'ID de la URL
-    const idParam = this.route.snapshot.paramMap.get('id');
+    const idParam = this.#route.snapshot.paramMap.get('id');
     
     if (idParam) {
       const id = +idParam; // Convertim el string 'id' a número

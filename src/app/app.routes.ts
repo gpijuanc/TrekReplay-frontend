@@ -7,6 +7,7 @@ import { Carret } from './pages/carret/carret';
 import { authGuard } from './auth/auth-guard'
 import { VenedorDashboard } from './pages/venedor-dashboard/venedor-dashboard';
 import { venedorGuard } from './auth/venedor-guard';
+import { ViatgeForm } from './pages/viatge-form/viatge-form';
 
 export const routes: Routes = [
     // Ruta principal
@@ -14,13 +15,12 @@ export const routes: Routes = [
     //Rutes
     { path: 'viatge/:id', component: ViatgeDetall },
     { path: 'carret', component: Carret, canActivate: [authGuard] },
-    { path: 'dashboard', component: VenedorDashboard, canActivate: [authGuard, venedorGuard] 
-  },
+    { path: 'dashboard', component: VenedorDashboard, canActivate: [authGuard, venedorGuard] },
+    { path: 'dashboard/crear', component: ViatgeForm, canActivate: [authGuard, venedorGuard] },
+    { path: 'dashboard/editar/:id', component: ViatgeForm, canActivate: [authGuard, venedorGuard] },
     // Rutes d'autenticació
     { path: 'login', component: Login },
     { path: 'register', component: Register },
-    
-    // Altres rutes (encara buides)
-    // { path: '', component: HomeComponent }, 
+
 ];
 

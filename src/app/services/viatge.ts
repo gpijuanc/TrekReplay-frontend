@@ -59,4 +59,11 @@ export class ViatgeService {
 
     return this.api.postWithFormData(`viatges/${viatgeId}/upload-foto`, formData);
   }
+
+  generarEnllac(plataforma: string, urlOriginal: string): Observable<any> {
+    return this.api.post('generar-enllac', { 
+      plataforma: plataforma, 
+      url: urlOriginal 
+    });
+  }
 }
