@@ -20,17 +20,14 @@ export class Header implements OnInit {
 
   ngOnInit() {
     // Ens subscrivim: Aquest codi s'executa AUTOMÀTICAMENT
-    // cada vegada que algú entra o surt (login/logout).
     this.authService.authStatus.subscribe(isAuthenticated => {
       this.isLoggedIn = isAuthenticated;
       
       if (this.isLoggedIn) {
-        // Si estem loguejats, recuperem les dades
         const usuari = this.authService.getUser();
         this.usuariNom = usuari?.nom || '';
         this.isVenedor = this.authService.isVenedor();
       } else {
-        // Si no, netegem les dades
         this.isVenedor = false;
         this.usuariNom = '';
       }
@@ -39,6 +36,5 @@ export class Header implements OnInit {
 
   logout() {
     this.authService.logout();
-    // NO cal cridar res més. El 'logout' del servei avisa al 'subscribe' de dalt.
   }
 }

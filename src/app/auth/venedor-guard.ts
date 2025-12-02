@@ -9,7 +9,7 @@ export const venedorGuard: CanActivateFn = (route, state) => {
 
   // Comprovem DUES coses: Està loguejat I és Venedor (role_id == 2)?
   if (authService.isLoggedIn() && authService.isVenedor()) {
-    return true; // Pot passar
+    return true; 
   }
 
   // Si és un Comprador o no està loguejat, el redirigim a la pàgina principal

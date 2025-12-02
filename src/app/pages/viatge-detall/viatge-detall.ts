@@ -1,8 +1,8 @@
 import { Component, inject, OnInit, SecurityContext } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router'; // Per llegir l'ID de la URL
-import { ViatgeService } from '../../services/viatge'; // El nostre servei
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser'; // Per renderitzar HTML
+import { ActivatedRoute } from '@angular/router'; 
+import { ViatgeService } from '../../services/viatge'; 
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AuthService } from '../../services/auth';
 import { CarretService } from '../../services/carret';
 import { Router } from '@angular/router';
@@ -32,19 +32,15 @@ export class ViatgeDetall implements OnInit {
   }
 
   ngOnInit(): void {
-    // 1. Obtenim l'ID de la URL
     const idParam = this.#route.snapshot.paramMap.get('id');
     
     if (idParam) {
-      const id = +idParam; // Convertim el string 'id' a número
-      
-      // 2. Cridem el servei per obtenir el viatge
+      const id = +idParam; 
+
       this.viatgeService.getViatgeById(id).subscribe({
         next: (data) => {
           this.viatge = data;
-          
-          // 3. Si és un viatge d'Afiliats, netegem l'HTML
-          // (Això és vital per seguretat i per renderitzar el blog)
+
           if (this.viatge.tipus_viatge === 'Afiliats') {
             this.blogHtml = this.sanitizer.sanitize(SecurityContext.HTML, this.viatge.blog);
           }
@@ -57,22 +53,19 @@ export class ViatgeDetall implements OnInit {
     }
   }
 
-  // TO-DO: Aquesta funció la implementarem quan fem el Carret
+  // TO-DO: Que farem en un futur?
   afegirAlCarret() {
-    // 1. Comprova si està loguejat
     if (!this.isLoggedIn) {
       this.router.navigate(['/login']);
       return;
     }
 
-    // 2. Comprova si és un paquet tancat (doble verificació)
     if (this.viatge && this.viatge.tipus_viatge === 'Paquet Tancat') {
       
       this.carretService.addItem(this.viatge.id).subscribe({
         next: (res) => {
           console.log("Item afegit", res);
           this.successMessage = 'Producte afegit al carret!';
-          // Esborra el missatge després de 3 segons
           setTimeout(() => this.successMessage = '', 3000);
         },
         error: (err) => {

@@ -7,7 +7,8 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
   //private baseUrl = 'http://127.0.0.1:8000/api';
-  private baseUrl = 'https://trekreplay-api.onrender.com/api';
+  //private baseUrl = 'https://trekreplay-api.onrender.com/api';
+  private baseUrl = '/api';
 
   constructor(private http: HttpClient) { }
 
@@ -30,7 +31,6 @@ export class ApiService {
   }
 
   post(endpoint: string, data: any): Observable<any> {
-    // Afegim la capçalera JSON
     const headers = this.getAuthHeaders().set('Content-Type', 'application/json');
     return this.http.post(`${this.baseUrl}/${endpoint}`, data, { headers: headers });
   }
@@ -45,11 +45,9 @@ export class ApiService {
   }
 
 
-  // === NOU MÈTODE PER PUJAR FITXERS (FormData) ===
+  // Pujar FITXERS
 
   postWithFormData(endpoint: string, formData: FormData): Observable<any> {
-    // Important: NO afegim 'Content-Type'. 
-    // El navegador ho farà automàticament amb el 'boundary' correcte per a FormData.
     return this.http.post(`${this.baseUrl}/${endpoint}`, formData, { 
       headers: this.getAuthHeaders() 
     });

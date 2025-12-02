@@ -33,7 +33,6 @@ export class ViatgeService {
 
   // Actualitzar un viatge (dades de text)
   updateViatge(id: number, data: any): Observable<any> {
-    // Fem servir PUT per actualitzar. Laravel ho gestionarà.
     return this.api.put(`viatges/${id}`, data);
   }
 
@@ -41,22 +40,18 @@ export class ViatgeService {
   deleteViatge(id: number): Observable<any> {
     return this.api.delete(`viatges/${id}`);
   }
-
-  // --- Funcions de Pujada d'Imatges (FormData) ---
-
+  //Pujar imatge cridant al FormData
   uploadImatgePrincipal(viatgeId: number, file: File): Observable<any> {
     const formData = new FormData();
     formData.append('imatge_principal', file, file.name);
-
-    // Cridem el nou mètode per a FormData
     return this.api.postWithFormData(`viatges/${viatgeId}/upload-principal`, formData);
   }
 
+  //Pujar imatge cridant al FormData
   uploadFotoGaleria(viatgeId: number, file: File, altText: string): Observable<any> {
     const formData = new FormData();
     formData.append('foto', file, file.name);
     formData.append('alt_text', altText);
-
     return this.api.postWithFormData(`viatges/${viatgeId}/upload-foto`, formData);
   }
 

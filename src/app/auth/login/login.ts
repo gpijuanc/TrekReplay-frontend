@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth'; 
 import { Router, RouterModule } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-login',
@@ -10,6 +11,7 @@ import { Router, RouterModule } from '@angular/router';
   templateUrl: './login.html', 
 })
 export class Login {
+    readonly #destroyRef = inject(DestroyRef);
   credentials = {
     correu: '',
     contrasenya: ''
@@ -19,11 +21,10 @@ export class Login {
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
-    this.authService.login(this.credentials).subscribe({
+    this.authService.login(this.credentials).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe({
       next: (res) => {
         console.log('Login correcte', res);
         
-        // === INICI DE LA MODIFICACIÓ ===
         // Comprovem el rol per a la redirecció
         if (this.authService.isVenedor()) {
           // Si és Venedor (role_id 2), va al seu panell

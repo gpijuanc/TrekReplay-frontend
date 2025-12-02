@@ -39,7 +39,6 @@ export class Carret implements OnInit {
     this.carretService.removeItem(viatgeId).subscribe({
       next: (res) => {
         this.successMessage = res.message;
-        // Recarreguem els items per actualitzar la vista
         this.carregarItems(); 
       },
       error: (err) => {
@@ -49,7 +48,7 @@ export class Carret implements OnInit {
     });
   }
 
-  // Funció per calcular el total (simulació)
+  // Funció per calcular el total
   calcularTotal() {
     return this.items.reduce((total, item) => total + parseFloat(item.viatge.preu), 0);
   }

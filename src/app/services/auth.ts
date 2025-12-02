@@ -11,7 +11,7 @@ export class AuthService {
   public authStatus = new BehaviorSubject<boolean>(this.hasToken());
 
   constructor(private api: ApiService, private router: Router) {
-    // Intentar recuperar l'usuari del localStorage si recarreguem la pàgina
+    // Ja hi ha un usuari loguejat??
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
       this.user = JSON.parse(savedUser);

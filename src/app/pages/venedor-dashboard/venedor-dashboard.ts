@@ -22,8 +22,8 @@ export class VenedorDashboard implements OnInit {
     this.carregarMeusViatges();
   }
 
+     // Carregar els vaitges
   carregarMeusViatges() {
-    // Resetejem missatges
     this.errorMessage = '';
     this.successMessage = '';
 
@@ -40,17 +40,16 @@ export class VenedorDashboard implements OnInit {
     });
   }
 
-  // === FUNCIÓ D'ESBORRAR (IMPLEMENTADA) ===
+  // Esborrar viatge 
   esborrarViatge(id: number) {
-    // Preguntem per seguretat
     if (!confirm('Estàs segur que vols esborrar aquest viatge? Aquesta acció no es pot desfer.')) {
       return;
     }
 
     this.viatgeService.deleteViatge(id).subscribe({
       next: (res) => {
-        this.successMessage = res.message; // "Viatge esborrat correctament"
-        this.carregarMeusViatges(); // Refresquem la llista
+        this.successMessage = res.message; 
+        this.carregarMeusViatges(); 
       },
       error: (err) => {
         console.error("Error esborrant viatge", err);
@@ -59,7 +58,7 @@ export class VenedorDashboard implements OnInit {
     });
   }
 
-  // === FUNCIÓ DE DESHABILITAR/PUBLICAR (IMPLEMENTADA) ===
+  // Deshabilitar o habilitar viatge
   canviarEstatPublicacio(id: number, estatActual: boolean) {
     const nouEstat = !estatActual;
     const accioText = nouEstat ? 'publicar' : 'deshabilitar';
@@ -67,7 +66,7 @@ export class VenedorDashboard implements OnInit {
     this.viatgeService.updateViatge(id, { publicat: nouEstat }).subscribe({
       next: () => {
         this.successMessage = `Viatge ${accioText} correctament.`;
-        this.carregarMeusViatges(); // Refresquem la llista
+        this.carregarMeusViatges();
       },
       error: (err) => {
         console.error(`Error al ${accioText} el viatge`, err);

@@ -12,29 +12,25 @@ import { Router, RouterModule } from '@angular/router';
   styleUrls: []
 })
 export class Register {
-  // Model de dades (amb valor per defecte per al rol)
   userData = {
     nom: '',
     correu: '',
     contrasenya: '',
-    role_id: 3, // Per defecte Comprador
-    OTA: false // Per defecte no és agència
+    role_id: 3, 
+    OTA: false
   };
   errorMessage: string = '';
 
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
-    // Cridem al servei de registre
     this.authService.register(this.userData).subscribe({
       next: (res) => {
         console.log('Registre correcte', res);
-        // Redirigim a l'inici (ja autenticats)
         this.router.navigate(['/']);
       },
       error: (err) => {
         console.error('Error de registre', err);
-        // Gestionem l'error (ex: correu ja existeix)
         if (err.error && err.error.correu) {
             this.errorMessage = 'Aquest correu ja està registrat.';
         } else if (err.error && err.error.contrasenya) {

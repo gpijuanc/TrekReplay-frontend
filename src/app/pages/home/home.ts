@@ -25,7 +25,6 @@ export class Home implements OnInit {
 
   constructor(private viatgeService: ViatgeService) {}
 
-  // Detall: 'ngOnInit' s'executa quan el component es carrega
   ngOnInit(): void {
     this.carregarViatges();
   }
@@ -48,24 +47,21 @@ export class Home implements OnInit {
   calcularPreuMaxim() {
     if (this.totsElsViatges.length === 0) return;
 
-    // Busquem el valor més alt a la propietat 'preu'
     const max = this.totsElsViatges.reduce((acc, viatge) => {
-      // Convertim a número, si és null (afiliats) compta com 0
       const preu = parseFloat(viatge.preu) || 0;
       return Math.max(acc, preu);
     }, 0);
 
-    // Si el màxim és 0 (només hi ha afiliats), posem un mínim visual de 100
     this.preuMaximReal = max > 0 ? max : 100;
   }
 
   aplicarFiltres() {
     this.viatgesFiltrats = this.totsElsViatges.filter(viatge => {
       
-      // 1. Filtre de Text (Cerca)
+      // Filtre de Text 
       const coincideixText = viatge?.titol?.toLowerCase().includes(this.cercaText?.toLowerCase());
 
-      // 2. Filtre de Tipus (Checkboxes)
+      // Filtre de Tipus
       let coincideixTipus = false;
       if (this.mostrarPaquets && viatge.tipus_viatge === 'Paquet Tancat') {
         coincideixTipus = true;
@@ -74,9 +70,7 @@ export class Home implements OnInit {
         coincideixTipus = true;
       }
 
-      // 3. Filtre de Preu
-      // Si és 'Afiliats' (preu null), sempre el mostrem si el checkbox està actiu
-      // Si és 'Paquet Tancat', mirem el preu
+      // Filtre de Preu
       let coincideixPreu = true;
       if (viatge.tipus_viatge === 'Paquet Tancat') {
         coincideixPreu = parseFloat(viatge.preu) <= this.filtrePreuMaxim;
@@ -84,10 +78,7 @@ export class Home implements OnInit {
       //Filtre de pais (com afegim la llista de paisos?)
       let coincideixPais = true;      
       if (this.filtrePais !== '') {
-         // Comprovem si el viatge té països definits
          if (viatge.pais && Array.isArray(viatge.pais)) {
-             // Mirem si ALGUN dels països del viatge coincideix amb el filtre
-             // (Fem servir toLowerCase per evitar problemes de majúscules)
              coincideixPais = viatge.pais.some((p: string) => 
                 p.toLowerCase().includes(this.filtrePais.toLowerCase())
              );
