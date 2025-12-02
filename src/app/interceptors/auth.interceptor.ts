@@ -2,7 +2,7 @@ import { HttpInterceptorFn } from '@angular/common/http';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // 1. Recuperem el token de la butxaca
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('auth_token');
 
   // 2. Si el tenim, el clonem dins la capçalera de la petició
   if (token) {
