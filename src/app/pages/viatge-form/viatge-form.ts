@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ViatgeService } from '../../services/viatge';
 import { QuillModule } from 'ngx-quill'; 
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-viatge-form',
@@ -14,26 +15,23 @@ import { QuillModule } from 'ngx-quill';
 })
 export class ViatgeForm implements OnInit {
   
-  // Dades del Viatge
+  readonly #destroyRef = inject(DestroyRef);
   viatge: any = {
     titol: '',
     blog: '',
-    tipus_viatge: 'Afiliats', // Per defecte
+    tipus_viatge: 'Afiliats', 
     preu: null,
     publicat: true,
-    pais: [] // Array buit inicialment
+    pais: [] 
   };
 
-  // Gestió d'Imatges
   portadaFile: File | null = null;
   galeriaFiles: FileList | null = null;
 
-  // Estat
   isEditing: boolean = false;
   viatgeId: number | null = null;
   errorMessage: string = '';
   
-  // Variable temporal per al país (input de text)
   paisInput: string = '';
 
   // Configuració de l'Editor (Botons que apareixen)
@@ -48,17 +46,17 @@ export class ViatgeForm implements OnInit {
   };
   savedSelection: any = null; 
   
-  // Llista de plataformes (per al modal d'afiliats)
+  // Llista de plataformes
   plataformes = [
     { name: 'Booking.com', key: 'Booking.com' },
     { name: 'Revolut', key: 'Revolut' },
     { name: 'Trip.com', key: 'Trip.com' }
   ];
   
-  // Variables per al Modal d'Afiliats
+  // Variables 
   showAffiliateModal: boolean = false;
   affiliateData = { platform: 'Booking.com', url: '', text: '' };
-  quillEditorInstance: any; // Referència a l'editor
+  quillEditorInstance: any;
 
   constructor(
     private viatgeService: ViatgeService,
@@ -77,10 +75,9 @@ export class ViatgeForm implements OnInit {
   }
 
   carregarViatge(id: number) {
-    this.viatgeService.getViatgeById(id).subscribe({
+    this.viatgeService.getViatgeById(id).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe({
       next: (data) => {
         this.viatge = data;
-        // Convertim l'array de països a text per mostrar-lo a l'input (si n'hi ha)
         if (this.viatge.pais && Array.isArray(this.viatge.pais)) {
             this.paisInput = this.viatge.pais.join(', ');
         }
@@ -89,7 +86,7 @@ export class ViatgeForm implements OnInit {
     });
   }
 
-  // === GESTIÓ D'IMATGES ===
+  // Imatges
   onPortadaSelected(event: any) {
     this.portadaFile = event.target.files[0];
   }
@@ -103,25 +100,22 @@ export class ViatgeForm implements OnInit {
   }
 
   obrirModalAfiliat() {
-    // 1. Capturem la selecció actual de l'editor
     const range = this.quillEditorInstance.getSelection();
     
     if (range) {
-      this.savedSelection = range; // Guardem la posició (Solució Error 1)
+      this.savedSelection = range;
       
-      // Si l'usuari ha seleccionat text, el guardem per mostrar-lo al modal
       if (range.length > 0) {
         this.affiliateData.text = this.quillEditorInstance.getText(range.index, range.length);
       } else {
-        this.affiliateData.text = ''; // No hi ha text seleccionat
+        this.affiliateData.text = ''; 
       }
     } else {
-        // Si no hi ha focus, assumim el final
         this.savedSelection = null;
         this.affiliateData.text = '';
     }
 
-    this.affiliateData.url = ''; // Netejar URL anterior
+    this.affiliateData.url = '';
     this.showAffiliateModal = true;
   }
 
@@ -131,13 +125,12 @@ export class ViatgeForm implements OnInit {
         return;
     }
 
-    // 1. Cridem al Back-end per obtenir la URL transformada
-    this.viatgeService.generarEnllac(this.affiliateData.platform, this.affiliateData.url)
+    // Cridem al Back-end per obtenir la URL transformada
+    this.viatgeService.generarEnllac(this.affiliateData.platform, this.affiliateData.url).pipe(takeUntilDestroyed(this.#destroyRef))
       .subscribe({
         next: (res) => {
             const urlFinal = res.url; // La URL amb els IDs ja posats
             
-            // 2. Inserim l'enllaç normal (sense atributs data-*)
             const index = this.savedSelection ? this.savedSelection.index : (this.quillEditorInstance.getLength() - 1);
             const length = this.savedSelection ? this.savedSelection.length : 0;
 
@@ -158,19 +151,17 @@ export class ViatgeForm implements OnInit {
       });
   }
 
-  // === GUARDAR (SUBMIT) ===
+  //GUARDAR
   onSubmit() {
-    // 1. Processar el país (Text -> Array)
+    // 1. Processar el país
     this.viatge.pais = this.paisInput.split(',').map(p => p.trim()).filter(p => p !== '');
 
     if (this.isEditing && this.viatgeId) {
-      // EDITAR
       this.viatgeService.updateViatge(this.viatgeId, this.viatge).subscribe({
         next: () => this.pujarImatges(this.viatgeId!),
         error: (err) => this.errorMessage = 'Error actualitzant el viatge'
       });
     } else {
-      // CREAR
       this.viatgeService.createViatge(this.viatge).subscribe({
         next: (res) => this.pujarImatges(res.data.id),
         error: (err) => this.errorMessage = 'Error creant el viatge'
@@ -203,7 +194,7 @@ export class ViatgeForm implements OnInit {
     // Executem totes les pujades (simulació simple, idealment amb forkJoin)
     let completats = 0;
     uploads.forEach(obs => {
-        obs.subscribe({
+        obs.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe({
             next: () => {
                 completats++;
                 if (completats === uploads.length) {

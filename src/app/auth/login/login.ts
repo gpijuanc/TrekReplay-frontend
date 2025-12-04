@@ -11,7 +11,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   templateUrl: './login.html', 
 })
 export class Login {
-    readonly #destroyRef = inject(DestroyRef);
+  readonly #destroyRef = inject(DestroyRef);
   credentials = {
     correu: '',
     contrasenya: ''

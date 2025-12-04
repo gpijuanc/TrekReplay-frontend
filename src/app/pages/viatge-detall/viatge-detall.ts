@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, SecurityContext } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, SecurityContext } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router'; 
 import { ViatgeService } from '../../services/viatge'; 
@@ -6,6 +6,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AuthService } from '../../services/auth';
 import { CarretService } from '../../services/carret';
 import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-viatge-detall',
@@ -14,6 +15,7 @@ import { Router } from '@angular/router';
   styleUrls: []
 })
 export class ViatgeDetall implements OnInit {
+  readonly #destroyRef = inject(DestroyRef);
   readonly #route= inject(ActivatedRoute);
   viatge: any = null; 
   blogHtml: SafeHtml | null = null; 
@@ -37,7 +39,7 @@ export class ViatgeDetall implements OnInit {
     if (idParam) {
       const id = +idParam; 
 
-      this.viatgeService.getViatgeById(id).subscribe({
+      this.viatgeService.getViatgeById(id).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe({
         next: (data) => {
           this.viatge = data;
 
@@ -62,7 +64,7 @@ export class ViatgeDetall implements OnInit {
 
     if (this.viatge && this.viatge.tipus_viatge === 'Paquet Tancat') {
       
-      this.carretService.addItem(this.viatge.id).subscribe({
+      this.carretService.addItem(this.viatge.id).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe({
         next: (res) => {
           console.log("Item afegit", res);
           this.successMessage = 'Producte afegit al carret!';

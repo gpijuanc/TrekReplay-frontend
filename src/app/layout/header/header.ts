@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-header',
@@ -11,7 +12,7 @@ import { AuthService } from '../../services/auth';
   styleUrls: []
 })
 export class Header implements OnInit {
-  
+  readonly #destroyRef = inject(DestroyRef);
   isLoggedIn: boolean = false;
   isVenedor: boolean = false;
   usuariNom: string = '';
@@ -20,7 +21,7 @@ export class Header implements OnInit {
 
   ngOnInit() {
     // Ens subscrivim: Aquest codi s'executa AUTOMÀTICAMENT
-    this.authService.authStatus.subscribe(isAuthenticated => {
+    this.authService.authStatus.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(isAuthenticated => {
       this.isLoggedIn = isAuthenticated;
       
       if (this.isLoggedIn) {

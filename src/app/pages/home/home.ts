@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ViatgeService } from '../../services/viatge'; 
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +13,7 @@ import { FormsModule } from '@angular/forms';
 })
 
 export class Home implements OnInit {
-  
+  readonly #destroyRef = inject(DestroyRef);
   errorMessage: string = '';
   viatgesFiltrats: any[] = [];
   mostrarPaquets: boolean = true;
@@ -30,7 +31,7 @@ export class Home implements OnInit {
   }
 
   carregarViatges() {
-    this.viatgeService.getViatges().subscribe({
+    this.viatgeService.getViatges().pipe(takeUntilDestroyed(this.#destroyRef)).subscribe({
       next: (data) => {
         this.totsElsViatges = data;
         this.calcularPreuMaxim();

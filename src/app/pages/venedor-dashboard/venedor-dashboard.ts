@@ -46,7 +46,7 @@ export class VenedorDashboard implements OnInit {
       return;
     }
 
-    this.viatgeService.deleteViatge(id).subscribe({
+    this.viatgeService.deleteViatge(id).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe({
       next: (res) => {
         this.successMessage = res.message; 
         this.carregarMeusViatges(); 
@@ -63,7 +63,7 @@ export class VenedorDashboard implements OnInit {
     const nouEstat = !estatActual;
     const accioText = nouEstat ? 'publicar' : 'deshabilitar';
 
-    this.viatgeService.updateViatge(id, { publicat: nouEstat }).subscribe({
+    this.viatgeService.updateViatge(id, { publicat: nouEstat }).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe({
       next: () => {
         this.successMessage = `Viatge ${accioText} correctament.`;
         this.carregarMeusViatges();

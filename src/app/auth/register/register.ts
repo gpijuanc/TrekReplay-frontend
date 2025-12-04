@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth';
 import { Router, RouterModule } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-register',
@@ -12,6 +13,7 @@ import { Router, RouterModule } from '@angular/router';
   styleUrls: []
 })
 export class Register {
+  readonly #destroyRef = inject(DestroyRef);
   userData = {
     nom: '',
     correu: '',
@@ -24,7 +26,7 @@ export class Register {
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
-    this.authService.register(this.userData).subscribe({
+    this.authService.register(this.userData).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe({
       next: (res) => {
         console.log('Registre correcte', res);
         this.router.navigate(['/']);

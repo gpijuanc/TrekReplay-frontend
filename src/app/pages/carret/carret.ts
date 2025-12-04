@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CarretService } from '../../services/carret';
 import { RouterModule } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-carret',
@@ -11,7 +12,7 @@ import { RouterModule } from '@angular/router';
   styleUrls: []
 })
 export class Carret implements OnInit {
-
+  readonly #destroyRef = inject(DestroyRef);
   items: any[] = [];
   errorMessage: string = '';
   successMessage: string = '';
@@ -23,7 +24,7 @@ export class Carret implements OnInit {
   }
 
   carregarItems() {
-    this.carretService.getItems().subscribe({
+    this.carretService.getItems().pipe(takeUntilDestroyed(this.#destroyRef)).subscribe({
       next: (data) => {
         this.items = data;
         console.log("Items del carret:", data);
@@ -36,7 +37,7 @@ export class Carret implements OnInit {
   }
 
   esborrarItem(viatgeId: number) {
-    this.carretService.removeItem(viatgeId).subscribe({
+    this.carretService.removeItem(viatgeId).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe({
       next: (res) => {
         this.successMessage = res.message;
         this.carregarItems(); 
