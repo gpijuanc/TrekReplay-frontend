@@ -6,6 +6,12 @@ import { ViatgeService } from '../../services/viatge';
 import { QuillModule } from 'ngx-quill'; 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+interface ImatgePendent {
+  file: File;
+  previewUrl: string | ArrayBuffer | null;
+  alt: string;
+}
+
 @Component({
   selector: 'app-viatge-form',
   standalone: true,
@@ -13,6 +19,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   templateUrl: './viatge-form.html',
   styleUrls: []
 })
+
 export class ViatgeForm implements OnInit {
   
   readonly #destroyRef = inject(DestroyRef);
@@ -26,7 +33,7 @@ export class ViatgeForm implements OnInit {
   };
 
   portadaFile: File | null = null;
-  galeriaFiles: FileList | null = null;
+  galeriaImatges: ImatgePendent[] = [];
 
   isEditing: boolean = false;
   viatgeId: number | null = null;
@@ -92,7 +99,30 @@ export class ViatgeForm implements OnInit {
   }
   
   onGaleriaSelected(event: any) {
-    this.galeriaFiles = event.target.files;
+    const files = event.target.files;
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        // Creem el lector per la previsualització
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          // Afegim a la nostra llista personalitzada
+          this.galeriaImatges.push({
+            file: file,
+            previewUrl: e.target?.result || null,
+            alt: '' // Comença buit perquè l'usuari l'ompli
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+    // Opcional: Netejar l'input perquè permeti seleccionar els mateixos fitxers de nou si cal
+    event.target.value = '';
+  }
+
+  removeImatgeGaleria(index: number) {
+    this.galeriaImatges.splice(index, 1);
   }
 
   editorCreated(quill: any) {
@@ -179,10 +209,9 @@ export class ViatgeForm implements OnInit {
     }
 
     // 2. Galeria (Bucle)
-    if (this.galeriaFiles) {
-      for (let i = 0; i < this.galeriaFiles.length; i++) {
-        uploads.push(this.viatgeService.uploadFotoGaleria(id, this.galeriaFiles[i], 'Galeria'));
-      }
+    for (const img of this.galeriaImatges) {
+      // Passem img.alt en lloc del text 'Galeria' fix
+      uploads.push(this.viatgeService.uploadFotoGaleria(id, img.file, img.alt));
     }
 
     // Si no hi ha imatges, acabem
