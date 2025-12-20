@@ -19,34 +19,49 @@
                class="w-full border rounded p-2">
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-            <label class="block font-semibold mb-1">Imatge de Portada</label>
-            <input type="file" (change)="onPortadaSelected($event)" accept="image/*" class="w-full">
-        </div>
-        <div>
-            <label class="block font-semibold mb-1">Galeria (Opcional)</label>
-            
-            <input type="file" (change)="onGaleriaSelected($event)" multiple accept="image/*" 
-                class="w-full mb-4 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+    <div class="bg-gray-50 p-4 rounded border">
+        <label class="block font-bold text-lg mb-2">Imatges del Viatge</label>
+        
+        <p class="text-sm text-gray-500 mb-4">
+            Afegeix totes les fotos aquí. <strong>La primera foto de la llista serà la Portada.</strong>
+            És obligatori posar una descripció (ALT) a cada foto.
+        </p>
 
-            <div *ngIf="galeriaImatges.length > 0" class="space-y-3">
-                <div *ngFor="let img of galeriaImatges; let i = index" 
-                    class="flex items-start gap-3 p-2 border rounded bg-white shadow-sm">
-                    
-                    <img [src]="img.previewUrl" class="w-16 h-16 object-cover rounded border">
-                    
-                    <div class="flex-1">
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Descripció (ALT)</label>
-                        <input type="text" [(ngModel)]="img.alt" [ngModelOptions]="{standalone: true}"
-                            placeholder="Ex: Vistes des del cim..."
-                            class="w-full text-sm border rounded p-1">
-                    </div>
+        <input type="file" (change)="onImatgesSelected($event)" multiple accept="image/*" 
+            class="block w-full text-sm text-slate-500
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-full file:border-0
+                file:text-sm file:font-semibold
+                file:bg-blue-50 file:text-blue-700
+                hover:file:bg-blue-100 mb-4">
 
-                    <button type="button" (click)="removeImatgeGaleria(i)" class="text-red-500 hover:text-red-700 font-bold p-1">
-                        ✕
-                    </button>
+        <div *ngIf="imatgesViatge.length > 0" class="space-y-3">
+            <div *ngFor="let img of imatgesViatge; let i = index" 
+                class="flex items-start gap-4 p-3 border rounded bg-white shadow-sm relative">
+                
+                <div *ngIf="i === 0" class="absolute top-0 left-0 bg-yellow-400 text-xs font-bold px-2 py-1 rounded-br z-10">
+                    ⭐ PORTADA
                 </div>
+
+                <img [src]="img.previewUrl" class="w-24 h-24 object-cover rounded border">
+                
+                <div class="flex-1">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">
+                        Descripció (ALT) <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" [(ngModel)]="img.alt" [ngModelOptions]="{standalone: true}"
+                        placeholder="Descriu la imatge per a Google..."
+                        class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                        [class.border-red-500]="!img.alt && intentEnviat">
+                    
+                    <p *ngIf="!img.alt && intentEnviat" class="text-xs text-red-500 mt-1">
+                        Aquest camp és obligatori.
+                    </p>
+                </div>
+
+                <button type="button" (click)="removeImatge(i)" class="text-gray-400 hover:text-red-600 font-bold p-2">
+                    ✕
+                </button>
             </div>
         </div>
     </div>

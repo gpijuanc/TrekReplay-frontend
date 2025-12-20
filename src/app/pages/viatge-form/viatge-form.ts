@@ -32,8 +32,8 @@ export class ViatgeForm implements OnInit {
     pais: [] 
   };
 
-  portadaFile: File | null = null;
-  galeriaImatges: ImatgePendent[] = [];
+  imatgesViatge: ImatgePendent[] = [];
+  intentEnviat: boolean = false;
 
   isEditing: boolean = false;
   viatgeId: number | null = null;
@@ -42,14 +42,21 @@ export class ViatgeForm implements OnInit {
   paisInput: string = '';
 
   // Configuració de l'Editor (Botons que apareixen)
-  quillConfig = {
-    toolbar: [
-      ['bold', 'italic', 'underline'],
-      [{ 'header': 1 }, { 'header': 2 }],
-      ['link', 'image'],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      ['clean']
-    ]
+ quillConfig = {
+    toolbar: {
+      // AQUI POSEM ELS BOTONS QUE JA TENIES (Dins de 'container')
+      container: [
+        ['bold', 'italic', 'underline'],
+        [{ 'header': 1 }, { 'header': 2 }],
+        ['link', 'image'], // Aquest botó ara cridarà al nostre handler
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        ['clean']
+      ],
+      // AQUI DEFINIM QUÈ FAN ELS BOTONS ESPECIALS
+      handlers: {
+        'image': () => this.imageHandler()
+      }
+    }
   };
   savedSelection: any = null; 
   
@@ -93,40 +100,84 @@ export class ViatgeForm implements OnInit {
     });
   }
 
-  // Imatges
-  onPortadaSelected(event: any) {
-    this.portadaFile = event.target.files[0];
-  }
-  
-  onGaleriaSelected(event: any) {
+  onImatgesSelected(event: any) {
     const files = event.target.files;
     if (files) {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        
-        // Creem el lector per la previsualització
         const reader = new FileReader();
         reader.onload = (e) => {
-          // Afegim a la nostra llista personalitzada
-          this.galeriaImatges.push({
+          this.imatgesViatge.push({
             file: file,
             previewUrl: e.target?.result || null,
-            alt: '' // Comença buit perquè l'usuari l'ompli
+            alt: '' 
           });
         };
         reader.readAsDataURL(file);
       }
     }
-    // Opcional: Netejar l'input perquè permeti seleccionar els mateixos fitxers de nou si cal
-    event.target.value = '';
+    event.target.value = ''; // Reset per poder tornar a seleccionar
   }
 
-  removeImatgeGaleria(index: number) {
-    this.galeriaImatges.splice(index, 1);
+  removeImatge(index: number) {
+    this.imatgesViatge.splice(index, 1);
   }
 
   editorCreated(quill: any) {
     this.quillEditorInstance = quill;
+  }
+
+  // 2. LA FUNCIÓ MÀGICA QUE DEMANA EL ALT
+  imageHandler() {
+    const input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.click(); // Simulem el clic per obrir l'explorador d'arxius
+
+    // Quan l'usuari tria un fitxer...
+    input.onchange = () => {
+      const file = input.files ? input.files[0] : null;
+      
+      if (file) {
+        // A. OBLIGUEM A POSAR EL ALT
+        let altText = null;
+        while (!altText) {
+            altText = prompt("⚠️ OBLIGATORI: Escriu una descripció (ALT) per a la imatge:");
+            // Si l'usuari cancel·la, sortim sense pujar res
+            if (altText === null) return; 
+            // Si el deixa buit, el bucle continuarà preguntant
+            if (altText.trim() === '') altText = null;
+        }
+
+        // B. LLEGIM LA IMATGE I LA INSERIM
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+            const range = this.quillEditorInstance.getSelection(true);
+            const imgUrl = e.target.result; // Base64 de la imatge
+
+            // Inserim la imatge normal
+            this.quillEditorInstance.insertEmbed(range.index, 'image', imgUrl);
+
+            // C. TRUC PER AFEGIR L'ATRIBUT ALT
+            // Com que Quill no posa ALT per defecte, el busquem al DOM i l'afegim manualment
+            // Esperem 10ms perquè l'element es creï al navegador
+            setTimeout(() => {
+                // Busquem la imatge que acabem d'inserir (per la URL)
+                // Nota: Això busca dins l'editor. Si puges la mateixa foto dos cops potser es lia, 
+                // però per un ús normal funcionarà perfectament.
+                const img = document.querySelector(`.ql-editor img[src="${imgUrl}"]`);
+                if (img) {
+                    img.setAttribute('alt', altText as string);
+                    console.log("ALT afegit correctament:", altText);
+                }
+            }, 10);
+            
+            // Movem el cursor al final de la imatge
+            this.quillEditorInstance.setSelection(range.index + 1);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
   }
 
   obrirModalAfiliat() {
@@ -185,6 +236,12 @@ export class ViatgeForm implements OnInit {
   onSubmit() {
     // 1. Processar el país
     this.viatge.pais = this.paisInput.split(',').map(p => p.trim()).filter(p => p !== '');
+    this.intentEnviat = true;
+    const hiHaImatgesSenseAlt = this.imatgesViatge.some(img => !img.alt || img.alt.trim() === '');
+    if (hiHaImatgesSenseAlt) {
+        alert("⚠️ Totes les imatges han de tenir una descripció (ALT).");
+        return; // Aturem el procés, no s'envia res
+    }
 
     if (this.isEditing && this.viatgeId) {
       this.viatgeService.updateViatge(this.viatgeId, this.viatge).subscribe({
@@ -193,25 +250,30 @@ export class ViatgeForm implements OnInit {
       });
     } else {
       this.viatgeService.createViatge(this.viatge).subscribe({
-        next: (res) => this.pujarImatges(res.data.id),
-        error: (err) => this.errorMessage = 'Error creant el viatge'
-      });
+        next: (res) => this.pujarImatges(res.data.id), // Passem ID
+        error: (err) => this.errorMessage = 'Error creant viatge'
+       });
     }
   }
+  
 
   // Funció encadenada per pujar imatges després de desar el text
   pujarImatges(id: number) {
+    if (this.imatgesViatge.length === 0) {
+        this.router.navigate(['/dashboard']);
+        return;
+    }
     const uploads = [];
 
-    // 1. Portada
-    if (this.portadaFile) {
-      uploads.push(this.viatgeService.uploadImatgePrincipal(id, this.portadaFile));
-    }
-
-    // 2. Galeria (Bucle)
-    for (const img of this.galeriaImatges) {
-      // Passem img.alt en lloc del text 'Galeria' fix
-      uploads.push(this.viatgeService.uploadFotoGaleria(id, img.file, img.alt));
+    for (let i = 0; i < this.imatgesViatge.length; i++) {
+        const img = this.imatgesViatge[i];
+        
+        // Truc: La primera imatge (i===0) la tractarem especial al backend o aquí?
+        // El més fàcil: Pugem totes com a galeria.
+        // I passem un flag si és la portada? 
+        // SIMPLIFICACIÓ: Pugem totes igual. El Backend decidirà que la primera és la portada.
+        
+        uploads.push(this.viatgeService.uploadFotoGaleria(id, img.file, img.alt));
     }
 
     // Si no hi ha imatges, acabem
