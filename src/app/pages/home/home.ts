@@ -18,7 +18,7 @@ export class Home implements OnInit {
   viatgesFiltrats: any[] = [];
   mostrarPaquets: boolean = true;
   totsElsViatges: any[] = [];
-  cercaText: any;
+  cercaText: string = '';
   filtrePreuMaxim: number = 3000;
   preuMaximReal: number = 1;
   mostrarAfiliats: boolean = true;
