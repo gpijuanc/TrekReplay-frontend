@@ -4,7 +4,7 @@
     Carregant dades del viatge...
   </div>
 
-  <div *ngIf="errorMessage" class="p-4 bg-red-100 text-red-700 rounded border border-red-400">
+  <div *ngIf="errorMessage" class="p-4 bg-red-100 text-red-700 rounded border border-red-400 mb-4">
     {{ errorMessage }}
   </div>
 
@@ -15,10 +15,28 @@
       <div class="flex flex-col md:flex-row gap-8">
         
         <div class="w-full md:w-1/2">
-          <img [src]="viatge.imatge_principal ? 'http://127.0.0.1:8000/storage/' + viatge.imatge_principal : 'https://via.placeholder.com/600x400.png?text=TrekReplay'" 
-               alt="{{ viatge.titol }}" 
-               class="w-full h-auto object-cover rounded-lg shadow-md">
-        </div>
+            <div class="relative w-full h-64 md:h-80 bg-gray-100 rounded-lg overflow-hidden shadow-md group">
+                
+                <div *ngIf="totesLesImatges.length === 0" class="flex items-center justify-center h-full text-gray-400">
+                    <span>No hi ha imatges</span>
+                </div>
+
+                <ng-container *ngIf="totesLesImatges.length > 0">
+                    <img [src]="totesLesImatges[indexActual].url" 
+                      [alt]="totesLesImatges[indexActual].alt"
+                      class="w-full h-full object-cover transition-opacity duration-500">
+                    
+                    <div class="absolute bottom-0 left-0 w-full bg-black/50 text-white p-2 text-center text-xs">
+                        {{ totesLesImatges[indexActual].alt || viatge.titol }}
+                    </div>
+
+                    <div *ngIf="totesLesImatges.length > 1">
+                        <button (click)="anteriorFoto()" class="absolute top-1/2 left-2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow opacity-0 group-hover:opacity-100 transition-opacity">❮</button>
+                        <button (click)="seguentFoto()" class="absolute top-1/2 right-2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow opacity-0 group-hover:opacity-100 transition-opacity">❯</button>
+                    </div>
+                </ng-container>
+            </div>
+            </div>
         
         <div class="w-full md:w-1/2">
           <h1 class="text-3xl font-bold text-gray-900">{{ viatge.titol }}</h1>
@@ -27,16 +45,13 @@
           </span>
           <p class="text-4xl font-light text-gray-800 my-4">€{{ viatge.preu }}</p>
           
-            <button (click)="afegirAlCarret()" class="w-full bg-black text-white py-3 px-6 rounded-lg font-semibold ...">
-                Afegir al carret
-            </button>
+          <button (click)="afegirAlCarret()" class="w-full bg-black text-white py-3 px-6 rounded-lg font-semibold hover:bg-gray-800 transition">
+              Afegir al carret
+          </button>
 
-            <div *ngIf="successMessage" class="mt-4 p-3 bg-green-100 text-green-700 rounded border border-green-400">
-                {{ successMessage }}
-            </div>
-            <div *ngIf="errorMessage" class="mt-4 p-3 bg-red-100 text-red-700 rounded border border-red-400">
-                {{ errorMessage }}
-            </div>
+          <div *ngIf="successMessage" class="mt-4 p-3 bg-green-100 text-green-700 rounded border border-green-400">
+              {{ successMessage }}
+          </div>
         </div>
       </div>
       
@@ -45,27 +60,47 @@
         <div class="prose max-w-none" [innerHTML]="blogHtml || viatge.blog"></div>
       </div>
 
-    </div><ng-template #afiliatView>
+    </div>
+
+    <ng-template #afiliatView>
       
       <h1 class="text-3xl font-bold text-gray-900">{{ viatge.titol }}</h1>
-      <span class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-full mt-2 inline-block">
+      <span class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-full mt-2 inline-block mb-6">
         Viatge mitjançant enllaços
       </span>
       
-      <img [src]="viatge.imatge_principal ? 'http://127.0.0.1:8000/storage/' + viatge.imatge_principal : 'https://via.placeholder.com/600x400.png?text=TrekReplay'" 
-           alt="{{ viatge.titol }}" 
-           class="w-full h-auto object-cover rounded-lg shadow-md my-6">
-      
+      <div class="relative w-full h-64 md:h-96 bg-gray-100 rounded-lg overflow-hidden shadow-md group mb-8">
+            <div *ngIf="totesLesImatges.length === 0" class="flex items-center justify-center h-full text-gray-400">
+                <span>No hi ha imatges</span>
+            </div>
+
+            <ng-container *ngIf="totesLesImatges.length > 0">
+                <img [src]="totesLesImatges[indexActual].url" 
+                  [alt]="totesLesImatges[indexActual].alt"
+                  class="w-full h-full object-cover transition-opacity duration-500">
+                
+                <div class="absolute bottom-0 left-0 w-full bg-black/50 text-white p-2 text-center text-xs">
+                    {{ totesLesImatges[indexActual].alt || viatge.titol }}
+                </div>
+
+                <div *ngIf="totesLesImatges.length > 1">
+                    <button (click)="anteriorFoto()" class="absolute top-1/2 left-4 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow opacity-0 group-hover:opacity-100 transition-opacity">❮</button>
+                    <button (click)="seguentFoto()" class="absolute top-1/2 right-4 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow opacity-0 group-hover:opacity-100 transition-opacity">❯</button>
+                </div>
+            </ng-container>
+      </div>
       <div class="mt-8">
         <h2 class="text-2xl font-semibold mb-4">Itinerari i Enllaços</h2>
         <div class="prose max-w-none" [innerHTML]="blogHtml"></div>
       </div>
       
-    </ng-template><div class="mt-12 border-t pt-8">
+    </ng-template>
+
+    <div class="mt-12 border-t pt-8">
       <h2 class="text-2xl font-semibold mb-4">Últims comentaris</h2>
       <div class="space-y-4">
-        <div class="border p-4 rounded-lg">Molt bonic</div>
-        <div class="border p-4 rounded-lg">Gran aventura</div>
+        <div class="border p-4 rounded-lg bg-gray-50">Molt bonic</div>
+        <div class="border p-4 rounded-lg bg-gray-50">Gran aventura</div>
       </div>
     </div>
 

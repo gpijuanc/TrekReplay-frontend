@@ -71,7 +71,7 @@
       <div *ngFor="let viatge of viatgesFiltrats" class="border rounded-lg shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow duration-200">
         
         <a [routerLink]="['/viatge', viatge.id]" class="block h-48 overflow-hidden relative">
-          <img [src]="viatge.imatge_principal ? 'http://127.0.0.1:8000/storage/' + viatge.imatge_principal : 'https://via.placeholder.com/400x300.png?text=TrekReplay'" 
+          <img [src]="viatge.imatge_principal ? 'http://127.0.0.1:8000' + viatge.imatge_principal : 'https://via.placeholder.com/400x300.png?text=TrekReplay'" 
                alt="{{ viatge.titol }}" 
                class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
           

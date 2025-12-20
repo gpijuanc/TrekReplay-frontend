@@ -17,11 +17,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export class ViatgeDetall implements OnInit {
   readonly #destroyRef = inject(DestroyRef);
   readonly #route= inject(ActivatedRoute);
+  
   viatge: any = null; 
   blogHtml: SafeHtml | null = null; 
   errorMessage: string = '';
   isLoggedIn: boolean = false;
   successMessage: string = '';
+  backendUrl = 'http://127.0.0.1:8000';
+  totesLesImatges: any[] = [];
+  indexActual: number = 0;
 
   constructor(
     private viatgeService: ViatgeService, 
@@ -30,7 +34,7 @@ export class ViatgeDetall implements OnInit {
     private authService: AuthService,
     private router: Router
   ) {
-    this.isLoggedIn = this.authService.isLoggedIn(); //ngOninit?
+    this.isLoggedIn = this.authService.isLoggedIn(); 
   }
 
   ngOnInit(): void {
@@ -42,6 +46,7 @@ export class ViatgeDetall implements OnInit {
       this.viatgeService.getViatgeById(id).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe({
         next: (data) => {
           this.viatge = data;
+          this.prepararCarrusel();
 
           if (this.viatge.tipus_viatge === 'Afiliats') {
             this.blogHtml = this.sanitizer.sanitize(SecurityContext.HTML, this.viatge.blog);
@@ -55,7 +60,61 @@ export class ViatgeDetall implements OnInit {
     }
   }
 
-  // TO-DO: Que farem en un futur?
+
+  prepararCarrusel() {
+    this.totesLesImatges = [];
+
+    // Funció que neteja i munta la URL perfecta
+    const muntarUrl = (path: string) => {
+      if (!path) return 'assets/placeholder.png'; 
+      if (path.startsWith('http')) return path;  
+      
+      let rutaNeta = path;
+
+      if (!rutaNeta.startsWith('/')) {
+        rutaNeta = '/' + rutaNeta;
+      }
+
+      if (!rutaNeta.startsWith('/storage')) {
+        rutaNeta = '/storage' + rutaNeta;
+      }
+
+      return this.backendUrl + rutaNeta;
+    };
+
+    if (this.viatge.imatge_principal) {
+      this.totesLesImatges.push({
+        url: muntarUrl(this.viatge.imatge_principal),
+        alt: this.viatge.titol
+      });
+    }
+
+    if (this.viatge.fotos && this.viatge.fotos.length > 0) {
+      this.viatge.fotos.forEach((f: any) => {
+        this.totesLesImatges.push({
+          url: muntarUrl(f.imatge_url),
+          alt: f.alt_text
+        });
+      });
+    }
+  }
+
+  seguentFoto() {
+    if (this.indexActual < this.totesLesImatges.length - 1) {
+      this.indexActual++;
+    } else {
+      this.indexActual = 0; 
+    }
+  }
+
+  anteriorFoto() {
+    if (this.indexActual > 0) {
+      this.indexActual--;
+    } else {
+      this.indexActual = this.totesLesImatges.length - 1;
+    }
+  }
+
   afegirAlCarret() {
     if (!this.isLoggedIn) {
       this.router.navigate(['/login']);
@@ -63,7 +122,6 @@ export class ViatgeDetall implements OnInit {
     }
 
     if (this.viatge && this.viatge.tipus_viatge === 'Paquet Tancat') {
-      
       this.carretService.addItem(this.viatge.id).pipe(takeUntilDestroyed(this.#destroyRef)).subscribe({
         next: (res) => {
           console.log("Item afegit", res);
